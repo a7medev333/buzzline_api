@@ -19,13 +19,15 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use('/uploads', express.static('uploads'));
 
 // MongoDB connection
-mongoose.connect('mongodb://localhost:27017/api-chat-app',
-    //  {
-    //   useNewUrlParser: true,
-    //   useUnifiedTopology: true,
-    // }
+// mongoose.connect('mongodb://localhost:27017/api-chat-app',
+//     //  {
+//     //   useNewUrlParser: true,
+//     //   useUnifiedTopology: true,
+//     // }
 
-);
+// );
+mongoose.connect("mongodb+srv://baronalsudani20:99KOaAOS8HSxUNPV@cluster0.vmixv.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0")
+// 99KOaAOS8HSxUNPV
 
 // Routes
 app.use('/api/users', userRoutes);
