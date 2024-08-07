@@ -1,0 +1,122 @@
+# One-to-One Chat Application
+
+This is a simple one-to-one chat application built with Node.js, Express, Socket.IO, and MongoDB. It supports real-time messaging and provides APIs to get all chats for a user and to get chats with a specific receiver.
+
+## Features
+
+- Real-time one-to-one messaging
+- Fetch all chats for a user
+- Fetch chats with a specific receiver
+
+## Prerequisites
+
+- Node.js
+- MongoDB
+
+## Installation
+
+1. Clone the repository:
+    ```bash
+    git clone https://github.com/yourusername/chat-app.git
+    cd chat-app
+    ```
+
+2. Install dependencies:
+    ```bash
+    npm install
+    ```
+
+3. Start MongoDB:
+    ```bash
+    mongod
+    ```
+
+4. Start the server:
+    ```bash
+    node server.js
+    ```
+
+## API Endpoints
+
+- `GET /api/chat/chats/:uuid`: Get all chats for a user by UUID.
+- `GET /api/chat/messages/:senderUuid/:receiverUuid`: Get one-to-one messages between two users.
+- `GET /api/chat/chats/with/:uuid/:receiverUuid`: Get all chats with a specific receiver.
+
+## Usage
+
+Open the `index.html` file in your browser, input your UUID, the receiver's UUID, and a message to start chatting.
+
+## Frontend Example
+
+Here is an example of a simple HTML client to test the chat functionality:
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>One-to-One Chat</title>
+  <script src="/socket.io/socket.io.js"></script>
+</head>
+<body>
+  <div>
+    <input type="text" id="sender" placeholder="Your UUID">
+    <input type="text" id="receiver" placeholder="Receiver's UUID">
+    <input type="text" id="message" placeholder="Message">
+    <button onclick="sendMessage()">Send</button>
+    <button onclick="getAllChats()">Get All Chats</button>
+    <button onclick="getChatsWithReceiver()">Get Chats with Receiver</button>
+  </div>
+  <div id="messages"></div>
+
+  <script>
+    const socket = io();
+
+    function joinChat() {
+      const uuid = document.getElementById('sender').value;
+      socket.emit('join', uuid);
+    }
+
+    function sendMessage() {
+      const sender = document.getElementById('sender').value;
+      const receiver = document.getElementById('receiver').value;
+      const message = document.getElementById('message').value;
+      socket.emit('sendMessage', { sender, receiver, message });
+    }
+
+    function getAllChats() {
+      const uuid = document.getElementById('sender').value;
+      fetch(`/api/chat/chats/${uuid}`)
+        .then(response => response.json())
+        .then(chats => displayMessages(chats));
+    }
+
+    function getChatsWithReceiver() {
+      const uuid = document.getElementById('sender').value;
+      const receiverUuid = document.getElementById('receiver').value;
+      fetch(`/api/chat/chats/with/${uuid}/${receiverUuid}`)
+        .then(response => response.json())
+        .then(chats => displayMessages(chats));
+    }
+
+    function displayMessages(chats) {
+      const messagesDiv = document.getElementById('messages');
+      messagesDiv.innerHTML = '';
+      chats.forEach(chat => {
+        const messageElement = document.createElement('div');
+        messageElement.innerText = `${chat.sender}: ${chat.message}`;
+        messagesDiv.appendChild(messageElement);
+      });
+    }
+
+    socket.on('receiveMessage', (chat) => {
+      const messagesDiv = document.getElementById('messages');
+      const messageElement = document.createElement('div');
+      messageElement.innerText = `${chat.sender}: ${chat.message}`;
+      messagesDiv.appendChild(messageElement);
+    });
+
+    document.getElementById('sender').addEventListener('change', joinChat);
+  </script>
+</body>
+</html>
